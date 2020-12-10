@@ -62,9 +62,13 @@ module CPU(
                     
     //DataPath-----------------------------------------------------------------------------
     logic [31:0] PCNext,PCPlus4;
-    logic [31:0] ExtImm,ExtImmE,SrcA,SrcB,SrcAE,Result,WriteDataE,WriteData;
-    logic [3:0] RA1,RA2,WA3W,WA3E,WA3M;
+    logic [31:0] ExtImm,ExtImmE,SrcA,SrcB,SrcAE,SrcAE1,Result,WriteDataE,WriteData,WriteDataE1;
+    logic [3:0] RA1,RA2,WA3W,WA3E,WA3M,RA1E,RA2E;
     logic [31:0] PC,InstrF,InstrD,ALUOutW,ReadDataW,ReadData,ALUResult;
+    
+    //Hazard_Unit--------------------------------------------------------------------------
+    logic [1:0] ForwardAE, ForwardBE;
+    Hazard_Unit HU(RegWriteM, RegWriteW,RA1E,RA2E,WA3M,WA3W,ForwardAE,ForwardBE);
     
     //Fetch
     mux2 #(32) pcmux(PCPlus4,Result,PCSrcW,PCNext);
@@ -80,12 +84,18 @@ module CPU(
     regfile rf(clk,RegWriteW,RA1,RA2,WA3W,Result,PCPlus4,SrcA,WriteData);
     extend ext(InstrD[23:0],ImmSrc,ExtImm);
     
-    flopr #(32) ffDecode1(clk,reset,SrcA,SrcAE);
-    flopr #(32) ffDecode2(clk,reset,WriteData,WriteDataE);
+    flopr #(32) ffDecode1(clk,reset,SrcA,SrcAE1);
+    flopr #(32) ffDecode2(clk,reset,WriteData,WriteDataE1);
     flopr #(4) ffDecode3(clk,reset,InstrD[15:12],WA3E);
     flopr #(32) ffDecode4(clk,reset,ExtImm,ExtImmE);
     
+    flopr #(4) ffDecode5(clk,reset,RA1,RA1E);
+    flopr #(4) ffDecode6(clk,reset,RA2,RA2E);
+    
     //Execute
+    mux4  FAE(SrcAE1, Result, ALUOutM, 32'd0, ForwardAE, SrcAE);
+    mux4  FBE(WriteDataE1, Result, ALUOutM, 32'd0, ForwardBE, WriteDataE);
+    
     mux2 #(32) srcbmux(WriteDataE,ExtImmE,ALUSrcE,SrcB);
     ALU_ref #(32) alu(SrcAE,SrcB,ALUControlE,ALUResult,ALUFlags);
     
