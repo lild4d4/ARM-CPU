@@ -29,6 +29,7 @@ module CPU(
     logic [3:0] ALUFlags,CondE;
     logic RegWriteD,RegWriteE,RegWriteE2,RegWriteM,RegWriteW,ALUSrcD,ALUSrcE,MemtoRegD,MemtoRegE,MemtoRegM,MemtoRegW,PCSrcD,PCSrcE,PCSrcM,PCSrcW;
     logic [1:0] RegSrc,ImmSrc,ALUControlD,ALUControlE;
+    logic StallF,StallD,FlushE;
     
     logic [1:0] FlagWriteD,FlagWriteE;
     logic PCS, MemWriteD,MemWriteE,MemWriteE2;
@@ -36,14 +37,14 @@ module CPU(
     decoder dec(InstrD[27:26],InstrD[25:20],InstrD[15:12],FlagWriteD,
          PCSrcD,RegWriteD,MemWriteD,MemtoRegD,ALUSrcD,ImmSrc,RegSrc,ALUControlD);
     
-    flopr #(1) ffCD1(clk,reset,PCSrcD,PCSrcE);
-    flopr #(1) ffCD2(clk,reset,RegWriteD,RegWriteE);
-    flopr #(1) ffCD3(clk,reset,MemtoRegD,MemtoRegE);
-    flopr #(1) ffCD4(clk,reset,MemWriteD,MemWriteE);
-    flopr #(2) ffCD5(clk,reset,ALUControlD,ALUControlE);
-    flopr #(1) ffCD6(clk,reset,ALUSrcD,ALUSrcE);
-    flopr #(2) ffCD7(clk,reset,FlagWriteD,FlagWriteE);
-    flopr #(4) ffCD8(clk,reset,InstrD[31:28],CondE);
+    flopr #(1) ffCD1(clk,FlushE,PCSrcD,PCSrcE);
+    flopr #(1) ffCD2(clk,FlushE,RegWriteD,RegWriteE);
+    flopr #(1) ffCD3(clk,FlushE,MemtoRegD,MemtoRegE);
+    flopr #(1) ffCD4(clk,FlushE,MemWriteD,MemWriteE);
+    flopr #(2) ffCD5(clk,FlushE,ALUControlD,ALUControlE);
+    flopr #(1) ffCD6(clk,FlushE,ALUSrcD,ALUSrcE);
+    flopr #(2) ffCD7(clk,FlushE,FlagWriteD,FlagWriteE);
+    flopr #(4) ffCD8(clk,FlushE,InstrD[31:28],CondE);
     
     //Conditional logic
     condlogic cl(clk,reset,CondE,ALUFlags,FlagWriteE,PCSrcE,RegWriteE,
@@ -68,15 +69,15 @@ module CPU(
     
     //Hazard_Unit--------------------------------------------------------------------------
     logic [1:0] ForwardAE, ForwardBE;
-    Hazard_Unit HU(RegWriteM, RegWriteW,RA1E,RA2E,WA3M,WA3W,ForwardAE,ForwardBE);
+    Hazard_Unit HU(RegWriteM, RegWriteW,MemtoRegE,RA1E,RA2E,RA1,RA2,WA3M,WA3W,WA3E,ForwardAE,ForwardBE,StallF,StallD,FlushE);
     
     //Fetch
     mux2 #(32) pcmux(PCPlus4,Result,PCSrcW,PCNext);
-    flopr #(32) pcreg(clk,reset,PCNext,PC);
+    flopenr #(32) pcreg(clk,reset,~StallF,PCNext,PC);
     adder #(32) pcadd1(PC,32'b100,PCPlus4);
     imem imem(PC,InstrF);
     
-    flopr #(32) ffFetch1(clk,reset,InstrF,InstrD);
+    flopenr #(32) ffFetch1(clk,reset,~StallD,InstrF,InstrD);
     
     //Decode
     mux2 #(4) ra1mux(InstrD[19:16],4'b1111,RegSrc[0],RA1);
@@ -84,10 +85,10 @@ module CPU(
     regfile rf(clk,RegWriteW,RA1,RA2,WA3W,Result,PCPlus4,SrcA,WriteData);
     extend ext(InstrD[23:0],ImmSrc,ExtImm);
     
-    flopr #(32) ffDecode1(clk,reset,SrcA,SrcAE1);
-    flopr #(32) ffDecode2(clk,reset,WriteData,WriteDataE1);
-    flopr #(4) ffDecode3(clk,reset,InstrD[15:12],WA3E);
-    flopr #(32) ffDecode4(clk,reset,ExtImm,ExtImmE);
+    flopr #(32) ffDecode1(clk,FlushE,SrcA,SrcAE1);
+    flopr #(32) ffDecode2(clk,FlushE,WriteData,WriteDataE1);
+    flopr #(4) ffDecode3(clk,FlushE,InstrD[15:12],WA3E);
+    flopr #(32) ffDecode4(clk,FlushE,ExtImm,ExtImmE);
     
     flopr #(4) ffDecode5(clk,reset,RA1,RA1E);
     flopr #(4) ffDecode6(clk,reset,RA2,RA2E);

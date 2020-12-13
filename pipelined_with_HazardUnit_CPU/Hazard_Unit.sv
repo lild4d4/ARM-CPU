@@ -21,13 +21,14 @@
 
 
 module Hazard_Unit(
-    input logic RegWriteM, RegWriteW,
-    input logic [3:0] RA1E,RA2E,
-    input logic [3:0] WA3M,WA3W,
-    output logic [1:0] ForwardAE, ForwardBE
+    input logic RegWriteM, RegWriteW,MemtoRegE,
+    input logic [3:0] RA1E,RA2E,RA1D,RA2D,
+    input logic [3:0] WA3M,WA3W,WA3E,
+    output logic [1:0] ForwardAE, ForwardBE,
+    output logic StallF, StallD, FlushE
     );
     
-    logic Match_1E_M, Match_1E_W, Match_2E_M, Match_2E_W;
+    logic Match_1E_M, Match_1E_W, Match_2E_M, Match_2E_W, Match_12D_E, LDRstall;
     
     //solving data hazards with forwarding
     assign Match_1E_M = (RA1E == WA3M);
@@ -50,5 +51,12 @@ module Hazard_Unit(
         else ForwardBE = 2'b00;
     
     end
+    
+    //Solving Data Hazards with stalls
+    assign Match_12D_E = (RA1D==WA3E)|(RA2D==WA3E);
+    assign LDRstall = Match_12D_E && MemtoRegE;
+    assign StallF = LDRstall;
+    assign StallD = LDRstall;
+    assign FlushE = LDRstall;
     
 endmodule
