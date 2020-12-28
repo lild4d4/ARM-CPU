@@ -25,8 +25,8 @@ module condlogic(
     input logic [3:0] Cond,
     input logic [3:0] ALUFlags,
     input logic [1:0] FlagW,
-    input logic PCS, RegW, MemW,
-    output logic PCSrc, RegWrite, MemWrite
+    input logic PCS, RegW, MemW,BranchE,
+    output logic PCSrc, RegWrite, MemWrite,BranchTakenE
     );
     
     logic [1:0] FlagWrite;
@@ -42,6 +42,7 @@ module condlogic(
     assign RegWrite = RegW & CondEx;
     assign MemWrite = MemW & CondEx;
     assign PCSrc = PCS & CondEx;
+    assign BranchTakenE = BranchE & CondEx;
       
 endmodule
 

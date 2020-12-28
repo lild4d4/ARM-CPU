@@ -24,11 +24,13 @@ module Hazard_Unit(
     input logic RegWriteM, RegWriteW,MemtoRegE,
     input logic [3:0] RA1E,RA2E,RA1D,RA2D,
     input logic [3:0] WA3M,WA3W,WA3E,
+    input logic BranchTakenE,PCSrcD, PCSrcE, PCSrcM,PCSrcW,
     output logic [1:0] ForwardAE, ForwardBE,
-    output logic StallF, StallD, FlushE
+    output logic StallF, StallD, FlushE, FlushD
     );
     
     logic Match_1E_M, Match_1E_W, Match_2E_M, Match_2E_W, Match_12D_E, LDRstall;
+    logic PCWrPendingF;
     
     //solving data hazards with forwarding
     assign Match_1E_M = (RA1E == WA3M);
@@ -52,11 +54,19 @@ module Hazard_Unit(
     
     end
     
+    assign PCWrPendingF = PCSrcD | PCSrcE | PCSrcM; //no funciona cuando esta implementado ???????????????
+    
     //Solving Data Hazards with stalls
     assign Match_12D_E = (RA1D==WA3E)|(RA2D==WA3E);
     assign LDRstall = Match_12D_E && MemtoRegE;
     assign StallF = LDRstall;
     assign StallD = LDRstall;
-    assign FlushE = LDRstall;
+    assign FlushE = LDRstall | BranchTakenE;
+    
+    //Solving control hazards
+    
+    assign FlushD = PCSrcW | BranchTakenE;
+    
+    
     
 endmodule

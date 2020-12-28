@@ -30,12 +30,13 @@ module CPU(
     logic RegWriteD,RegWriteE,RegWriteE2,RegWriteM,RegWriteW,ALUSrcD,ALUSrcE,MemtoRegD,MemtoRegE,MemtoRegM,MemtoRegW,PCSrcD,PCSrcE,PCSrcM,PCSrcW;
     logic [1:0] RegSrc,ImmSrc,ALUControlD,ALUControlE;
     logic StallF,StallD,FlushE;
+    logic BranchD,BranchE,BranchTakenE;
     
     logic [1:0] FlagWriteD,FlagWriteE;
     logic PCS, MemWriteD,MemWriteE,MemWriteE2;
     //Control unit
     decoder dec(InstrD[27:26],InstrD[25:20],InstrD[15:12],FlagWriteD,
-         PCSrcD,RegWriteD,MemWriteD,MemtoRegD,ALUSrcD,ImmSrc,RegSrc,ALUControlD);
+         PCSrcD,RegWriteD,BranchD,MemWriteD,MemtoRegD,ALUSrcD,ImmSrc,RegSrc,ALUControlD);
     
     flopr #(1) ffCD1(clk,FlushE,PCSrcD,PCSrcE);
     flopr #(1) ffCD2(clk,FlushE,RegWriteD,RegWriteE);
@@ -45,10 +46,11 @@ module CPU(
     flopr #(1) ffCD6(clk,FlushE,ALUSrcD,ALUSrcE);
     flopr #(2) ffCD7(clk,FlushE,FlagWriteD,FlagWriteE);
     flopr #(4) ffCD8(clk,FlushE,InstrD[31:28],CondE);
+    flopr #(1) ffCD9(clk,FlushE,BranchD,BranchE);
     
     //Conditional logic
     condlogic cl(clk,reset,CondE,ALUFlags,FlagWriteE,PCSrcE,RegWriteE,
-                MemWriteE,PCS,RegWriteE2,MemWriteE2);
+                MemWriteE,BranchE,PCS,RegWriteE2,MemWriteE2,BranchTakenE);
     
     //
     flopr #(1) ffCE1(clk,reset,PCS,PCSrcM);
@@ -62,22 +64,24 @@ module CPU(
     flopr #(1) ffCM3(clk,reset,MemtoRegM,MemtoRegW);
                     
     //DataPath-----------------------------------------------------------------------------
-    logic [31:0] PCNext,PCPlus4;
+    logic [31:0] PCNext,PCPlus4,PCintermedio;
     logic [31:0] ExtImm,ExtImmE,SrcA,SrcB,SrcAE,SrcAE1,Result,WriteDataE,WriteData,WriteDataE1;
     logic [3:0] RA1,RA2,WA3W,WA3E,WA3M,RA1E,RA2E;
     logic [31:0] PC,InstrF,InstrD,ALUOutW,ReadDataW,ReadData,ALUResult;
     
     //Hazard_Unit--------------------------------------------------------------------------
     logic [1:0] ForwardAE, ForwardBE;
-    Hazard_Unit HU(RegWriteM, RegWriteW,MemtoRegE,RA1E,RA2E,RA1,RA2,WA3M,WA3W,WA3E,ForwardAE,ForwardBE,StallF,StallD,FlushE);
+    Hazard_Unit HU(RegWriteM, RegWriteW,MemtoRegE,RA1E,RA2E,RA1,RA2,WA3M,WA3W,WA3E,BranchTakenE,
+                    PCSrcD, PCSrcE, PCSrcM,PCSrcW,ForwardAE,ForwardBE,StallF,StallD,FlushE,FlushD);
     
     //Fetch
-    mux2 #(32) pcmux(PCPlus4,Result,PCSrcW,PCNext);
+    mux2 #(32) pcmux(PCPlus4,Result,PCSrcW,PCintermedio);
+    mux2 #(32) branchmux(PCintermedio,ALUResult,BranchTakenE,PCNext);
     flopenr #(32) pcreg(clk,reset,~StallF,PCNext,PC);
     adder #(32) pcadd1(PC,32'b100,PCPlus4);
     imem imem(PC,InstrF);
     
-    flopenr #(32) ffFetch1(clk,reset,~StallD,InstrF,InstrD);
+    flopenr #(32) ffFetch1(clk,FlushD,~StallD,InstrF,InstrD);
     
     //Decode
     mux2 #(4) ra1mux(InstrD[19:16],4'b1111,RegSrc[0],RA1);

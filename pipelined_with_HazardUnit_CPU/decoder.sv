@@ -25,13 +25,13 @@ module decoder(
     input logic [5:0] Funct,
     input logic [3:0] Rd,
     output logic [1:0] FlagW,
-    output logic PCS, RegW, MemW,
+    output logic PCS, RegW, Branch, MemW,
     output logic MemtoReg, ALUSrc,
     output logic [1:0] ImmSrc, RegSrc, ALUControl
     );
     
     logic [9:0] controls;
-    logic Branch, ALUOp;
+    logic ALUOp;
    
     //main decoder
     always_comb begin
@@ -44,7 +44,10 @@ module decoder(
             
                    else controls = 10'b1001110100;          //STR
                    
-            2'b10: controls = 10'b0110100010;
+            2'b10: begin
+            controls = 10'b0110100010;
+            $display("BRANCH");
+            end
             
             default: controls = 10'bx;                      //Unimplemented
                    
@@ -75,6 +78,6 @@ module decoder(
     end
     
     //PC logic 
-    assign PCS = ((Rd == 4'b1111)&RegW)|Branch;
+    assign PCS = (Rd == 4'b1111)&RegW;
     
 endmodule
