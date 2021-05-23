@@ -1,6 +1,7 @@
 CPU V1 Benchmark: ARM_CPU_sinlge-cycle
 
-The following program test every available instruction in the architecture of the designed CPU, only if the CPU is working the result should be the expected, this kind of test is known as ad hoc testing
+The following program test every available instruction in the architecture of the designed CPU, only if the CPU is working the result should be the expected, 
+this kind of test is known as ad hoc testing
 
 ADDR        Program                         Comments                            Binary Machine Code                                 HEX Code
 
