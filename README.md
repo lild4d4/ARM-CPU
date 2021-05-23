@@ -9,14 +9,17 @@
     ├── BM V2
     └── BM V3
 ├── Design CPU V1              # first CPU version (no pipeline, no hazard unit control)
-    ├── SystemVerilog
-    └── Hex BM
+    ├── Hex BM
+    ├── Module Sources
+    └── Simulation Sources
 ├── Design CPU V2              # second CPU version (with pipeline, no hazard unit control)
-    ├── systemVerilog
-    └── Hex BM
+    ├── Hex BM
+    ├── Module Sources
+    └── Simulation Sources
 ├── Design CPU V3              # third CPU version (with pipeline and with hazard unit control)
-    ├── systemVerilog
-    └── Hex BM
+    ├── Hex BM
+    ├── Module Sources
+    └── Simulation Sources
 └── README.md
 ```
 
