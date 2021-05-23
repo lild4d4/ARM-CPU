@@ -1,10 +1,10 @@
 Pipelined_ARM_CPU_sinlge-cycle
 
-//El siguiente programa prueba todas las instrucciones disponibles en la arquitectura de la CPU diseñada, el programa deberia dar el resultado correcto 
-//solo en el caso de que la CPU funcione correctamente, este tipo de testeo se le conoce como ad hoc testing.
+The following program test every available instruction in the architecture of the designed CPU, only if the CPU is working the result should be the expected, 
+this kind of test is known as ad hoc testing
 
-//debido a que la micro arquitectura de esta CPU cuenta con 5 etapas de pipelining se debe considerar la instruccion NOP,
-//la cual sera caracterizada como NOP = ADD R0,R0,#0, en binario = 1110 001 0100 0 0000 0000 0000 0000 0000 = E2800000
+this micro architecture has 5 pipelining states so it is necessary to add a new instrucction "NOP", 
+wich will be implemented as ADD RO, RO, #0, in binary = 1110 001 0100 0 0000 0000 0000 0000 0000 = E2800000
 
 ADDR        Program                         Comments                            Binary Machine Code                                 HEX Code
 
@@ -64,7 +64,7 @@ X 44        X ADD R15, R15, R0              ; X PC = PC+8 (skips next)          
 54          ADD R2, R0, #10                 ; shouldn't happen                  1110 001 0100 0 0000 0010 0000 0000 0001            E280200A
 58          END STR R2, [R0, #100]          ; mem[100] = 7                      1110 010 1100 0 0000 0010 0000 0101 0100            E5802064
                                                                                 
-Numero total de instrucciones: 54
-Numero de instrucciones que realizan acciones: 23
+number of instructions: 54
+number of instructions that make an action: 23
 
-//Resultado final esperado: guardar el valor 7 en la direccion de memoria 100
+Expected Result: saved the number "7" in the direction 100 of the memory

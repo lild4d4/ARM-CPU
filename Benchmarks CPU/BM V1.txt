@@ -29,6 +29,6 @@ ADDR        Program                         Comments                            
 54          ADD R2, R0, #10                 ; shouldn't happen                  1110 001 0100 0 0000 0010 0000 0000 0001            E280200A
 58          END STR R2, [R0, #100]          ; mem[100] = 7                      1110 010 1100 0 0000 0010 0000 0101 0100            E5802064
 
-//Number of instructions: 23
+Number of instructions: 23
 
-//Expected Result: saved the number "7" in the direction 100 of the memory
+Expected Result: saved the number "7" in the direction 100 of the memory
