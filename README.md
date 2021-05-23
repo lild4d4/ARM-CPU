@@ -25,5 +25,5 @@
 1. Clone the repository
 2. Open Vivado
 3. Create a new project with the board "XC7A100TCSG324-1"
-4. In the project go to `add sources -> add or create design sources -> add Directories` select the `Module Sources` from the version you want to use then `finish`
-5. 
+4. Add the modules, `add sources -> add or create design sources -> add Directories` select the `Module Sources` from the version you want to use then `finish`
+5. Add the test bench, `add sources -> add or create simulation sources -> add Directories` select the `Simulation Sources` from the same version you used before, then `finish`
