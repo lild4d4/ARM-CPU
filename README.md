@@ -24,5 +24,5 @@
 
 1. Clone the repository
 2. Open Vivado
-3. Create a new project wio
-4.  
+3. Create a new project with the board "XC7A100TCSG324-1"
+4. In the project go to `add sources -> add or create design sources -> add Directories`
