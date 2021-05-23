@@ -8,10 +8,10 @@ wich will be implemented as ADD RO, RO, #0, in binary = 1110 001 0100 0 0000 000
 
 ADDR        Program                         Comments                            Binary Machine Code                                 HEX Code
 
-00     MAIN SUB R0, R15, R15                ; R0 = 0                            1110 000 0010 0 1111 0000 0000 0000 1111            E04F000F        ; esta instruccion se repite ya que es el valor inicial
-                                                                                                                                    E04F000F        ; y se desea que el registro R0 este listo para usarse 
-                                                                                                                                    E04F000F        ; antes del comienzo del programa (esto tambien se podria realizar
-                                                                                                                                    E04F000F        ; ingresando este valor desde la ROM)
+00     MAIN SUB R0, R15, R15                ; R0 = 0                            1110 000 0010 0 1111 0000 0000 0000 1111            E04F000F        ; this instruction will be repeated 3 times because is the initial value
+                                                                                                                                    E04F000F        ; and it is expected R0 has this value 
+                                                                                                                                    E04F000F        ; before the program starts (this could be also made by
+                                                                                                                                    E04F000F        ; adding this value directly in the ROM)
 04          ADD R2, R0, #5                  ; R2 = 5                            1110 001 0100 0 0000 0010 0000 0000 0101            E2802005                                                            
 08          ADD R3, R0, #12                 ; R3 = 12                           1110 001 0100 0 0000 0011 0000 0000 1100            E280300C
             NOP                                                                                                                     E2800000
@@ -33,9 +33,8 @@ ADDR        Program                         Comments                            
             NOP                                                                                                                     E2800000
             NOP                                                                                                                     E2800000
 24          SUBS R8, R3, R4                 ; R8 = 12 - 7 = 5                   1110 000 0010 1 0011 1000 0000 0000 0100            E0538004
-28          BGE AROUND                      ; should be taken                   1010 101 0000 0 0000 0000 0000 0000 0000            AA000004        ; se debe modificar la instruccion ademas de agregar los NOP,
-            NOP                                                                                                                     E2800000        ; esto debido a que se agregan mas instrucciones que el branch
-            NOP                                                                                                                     E2800000        ; debe saltar, especificamente las 5 instrucciones NOP
+28          BGE AROUND                      ; should be taken                   1010 101 0000 0 0000 0000 0000 0000 0000            AA000004        ; (?) the instruction will change 
+            NOP                                                                                                                     E2800000        ; because now it has to jump the 5 new NOPs in the code                                                                                                   E2800000        
             NOP                                                                                                                     E2800000
             NOP                                                                                                                     E2800000
 2C          ADD R5, R0, #0                  ; should be skipped                 1110 001 0100 0 0000 0101 0000 0000 0000            E2805000
@@ -48,9 +47,9 @@ ADDR        Program                         Comments                            
             NOP                                                                                                                     E2800000
 3C          STR R7, [R3, #84]               ; mem[12+84] = 7                    1110 010 1100 0 0011 0111 0000 0101 0100            E5837054        
 40          LDR R2, [R0, #96]               ; R2 = mem[96] = 7                  1110 010 1100 1 0000 0010 0000 0110 0000            E5902060        
-X 44        X ADD R15, R15, R0              ; X PC = PC+8 (skips next)          X 1110 000 0100 0 1111 1111 0000 0000 0000          X E08FF000      ; se debe modificar la instruccion ademas de los NOP,
-44          ADD R15, R15, #16               ; PC = (PC+8)+16 (skip 5 instr.)    1110 001 0100 0 1111 1111 0000 0001 0000            E28FF010        ; esto debido a que se agregan mas instrucciones que se deben
-            NOP                                                                                                                     E2800000        ; saltar con la modificacion de PC
+X 44        X ADD R15, R15, R0              ; X PC = PC+8 (skips next)          X 1110 000 0100 0 1111 1111 0000 0000 0000          X E08FF000      ; same as (?)
+44          ADD R15, R15, #16               ; PC = (PC+8)+16 (skip 5 instr.)    1110 001 0100 0 1111 1111 0000 0001 0000            E28FF010        
+            NOP                                                                                                                     E2800000        
             NOP                                                                                                                     E2800000
             NOP                                                                                                                     E2800000
             NOP                                                                                                                     E2800000
