@@ -1,6 +1,6 @@
 # Basic ARM-CPU
  
- The main codes for this CPU are from the book "Digital Design and Computer Architecture: ARM Edition" by Sarah L. Harris (Author), David Harris  (Author).
+ You can find all the information about this CPU and it's main module codes in the book "Digital Design and Computer Architecture: ARM Edition" by Sarah L. Harris (Author), David Harris  (Author).
  
 # Directory Structure
 ```
