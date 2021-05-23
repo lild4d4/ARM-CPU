@@ -19,4 +19,10 @@
     └── Hex BM
 └── README.md
 ```
- 
+
+# Quickstart guide
+
+1. Clone the repository
+2. Open Vivado
+3. Create a new project wio
+4.  
